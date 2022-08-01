@@ -1,0 +1,59 @@
+﻿@page "/fetchchampions"
+
+@using MyFirstBlazorApp.Data
+@inject ChampionService championService
+
+<h1>Champions</h1>
+
+<p>Get Champion statistics and compare!</p>
+
+<input @bind=CurrentValue/>
+
+<p>Champion Added: @NewValue</p>
+
+<button class="btn btn-primary" @onclick=GetValuet>Click me</button>
+
+@if (champions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>               
+                <th>Champion Name</th>
+                <th>Attack Speed</th>
+                <th>Attack Range</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var champion in champions)
+            {
+                <tr>
+                    <td>@champion.Name</td>
+                    <td>@champion.AttackSpeed</td>
+                    <td>@champion.AttackRange</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    public ChampionInfo[] champions;
+    public string CurrentValue { get; set; }
+
+    public string NewValue { get; set; }
+
+    private  async Task GetValuet()
+
+    {
+        NewValue = CurrentValue;
+        ChampionService cService = new ChampionService();
+        cService.newChamp = NewValue;
+        champions = await cService.GetChampionInfo();      
+    }
+
+}
