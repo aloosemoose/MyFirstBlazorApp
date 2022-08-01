@@ -6,18 +6,10 @@ namespace MyFirstBlazorApp.Data
     {
         public List<ChampionInfo> champions = new List<ChampionInfo>();
         public int i = 1;
-        public  string[] championNames = new[] 
-        {
-            "Aatrox", "Ahri", "Jinx",""
-        };
-        public  string[] atkSpeeds = new[]
-        {
-           "","","",""
-        };
-        public  string[] atkRanges = new[]
-        {
-           "","","",""
-        };
+
+        public string[] championNames = new string[] { }; 
+        public  string[] atkSpeeds = new string[] { };     
+        public  string[] atkRanges = new string[] { };
 
     }
 }

@@ -41,17 +41,19 @@ else
 }
 
 @code {
-
+    public int NoChampions = 0;
     public ChampionInfo[] champions;
     public string CurrentValue { get; set; }
-
-    public string NewValue { get; set; }
+    ChampionService cService = new ChampionService();
+    public string NewValue;
 
     private  async Task GetValuet()
 
     {
-        NewValue = CurrentValue;
-        ChampionService cService = new ChampionService();
+
+        NoChampions++;
+        NewValue = CurrentValue;       
+        cService.NoChampionsSoFar = NoChampions;
         cService.newChamp = NewValue;
         champions = await cService.GetChampionInfo();      
     }
