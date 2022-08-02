@@ -1,4 +1,4 @@
-﻿namespace MyFirstBlazorApp.Data
+﻿namespace My2Blazor.Data
 {
     public class ChampionInfo
     {

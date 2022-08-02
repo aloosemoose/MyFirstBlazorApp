@@ -1,22 +1,26 @@
 ﻿@page "/fetchchampions"
 
-@using MyFirstBlazorApp.Data
+@using My2Blazor.Data
 @inject ChampionService championService
 
-<h1>Champions</h1>
+<h1>Inspect League Champions</h1>
 
 <p>Get Champion statistics and compare!</p>
 
+
 <input @bind=CurrentValue/>
 
-<p>Champion Added: @NewValue</p>
 
-<button class="btn btn-primary" @onclick=GetValuet>Click me</button>
+<p>Advice: @advice</p>
 
+
+<button class="btn btn-primary" @onclick=GetValuet>Add</button>
+  
 @if (champions == null)
 {
     <p><em>Loading...</em></p>
 }
+
 else
 {
     <table class="table">
@@ -41,21 +45,44 @@ else
 }
 
 @code {
+
     public int NoChampions = 0;
     public ChampionInfo[] champions;
     public string CurrentValue { get; set; }
     ChampionService cService = new ChampionService();
     public string NewValue;
-
-    private  async Task GetValuet()
+    public bool errorMessage;
+    public string advice = "Try adding a champion!";
+    private async Task GetValuet()
 
     {
 
+        errorMessage = false;
         NoChampions++;
+
         NewValue = CurrentValue;       
         cService.NoChampionsSoFar = NoChampions;
         cService.newChamp = NewValue;
-        champions = await cService.GetChampionInfo();      
+        cService.ProcessInput();
+        errorMessage = cService.ErrorMessage;
+
+
+        if(errorMessage)
+        {
+            NoChampions--;
+            cService.NoChampionsSoFar = NoChampions;
+            advice = "You must input a valid champion name. The search is case sensitive, make sure to include the correct punctuation and spaces.";
+        }
+        else
+        {
+            advice = "Try adding another!";
+            champions = await cService.GetChampionInfo();
+        }
+        
+
+        
+
+ 
     }
 
 }

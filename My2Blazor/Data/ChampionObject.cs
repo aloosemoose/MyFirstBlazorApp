@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MyFirstBlazorApp.Data
+namespace My2Blazor.Data
 {
     public class ChampionObject
     {
