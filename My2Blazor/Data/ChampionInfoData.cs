@@ -10,6 +10,7 @@ namespace My2Blazor.Data
         public string[] championNames = new string[] { }; 
         public  string[] atkSpeeds = new string[] { };     
         public  string[] atkRanges = new string[] { };
-
+        public string[] manaPoints = new string[] { };
+        public string[] healthPoints = new string[] {};
     }
 }

@@ -11,84 +11,29 @@ namespace My2Blazor.Data
     {
         public string BaseUrl = "http://ddragon.leagueoflegends.com";
         public string version = "12.13.1";
-        // public string[] championName = { "Aatrox", "Ahri", "Jinx", "" };
-        // public string[] championName = new string[] { };
+   
         public string fixString;
-        public int championCounter = 0;
+
         public string newChamp;
+        public string newChampOriginal;
+        public string jsonChampName;
+
         public int NoChampionsSoFar;
+        public bool ErrorMessage;
+
         public List<string> currentChampList = new List<string>();
         public List<string> aattackSpeeds = new List<string>();
         public List<string> aattackRanges = new List<string>();
-        public bool ErrorMessage;
-
-        public ChampionInfoData chData = new ChampionInfoData();
-
-        public bool GetRequest()
-        {
-            try
-            {
-                while (championCounter <= NoChampionsSoFar - 1)
-                {
-                    string url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/data/en_US/champion/" + newChamp + ".json";
-
-                    var methodType = Method.Get;
-
-                    RestClient client = new RestClient(BaseUrl);
-                    RestRequest request = new RestRequest(url, methodType);
-                    RestResponse response = client.ExecuteGet(request);
-
-                    var statusCode = response.StatusCode.ToString();
-                    string jsonResponse = response.Content;
-
-                    fixString = jsonResponse;
-                    var result = fixString.Replace(newChamp, "Champion");
-
-                    ChampionObject.Root jsonIntoObject = JsonConvert.DeserializeObject<ChampionObject.Root>(result);
-
-
-                    aattackSpeeds.Add(jsonIntoObject.data.champion.stats.attackspeed.ToString());
-                    aattackRanges.Add(jsonIntoObject.data.champion.stats.attackrange.ToString());
-                    currentChampList.Add(newChamp);
-
-                    championCounter++;
-
-                }
-
-                return true;
-            }
-            catch(Exception ex)
-            {
-                return false;
-            }
+        public List<string> mmanaPoints = new List<string>();
+        public List<string> hhealthPoints = new List<string>();
            
-        }
-
-
-        public Task<ChampionInfo[]> GetChampionInfo()
-        {
-           // ProcessInput();
-
-
-            return Task.FromResult(Enumerable.Range(0, NoChampionsSoFar).Select(index => new ChampionInfo(chData.championNames[index], chData.atkSpeeds[index], chData.atkRanges[index])
-            {
-                Name = chData.championNames[index],
-                AttackSpeed = chData.atkSpeeds[index],
-                AttackRange = chData.atkRanges[index],
-
-            }).ToArray());
-
-
-
-        }
+        public ChampionInfoData chData = new ChampionInfoData();
 
         public void ProcessInput()
         {
 
-
             if (PeskyChampions() == false)
             {
-
                 if (newChamp.Contains(" "))
                 {
                     string s = newChamp[0].ToString();
@@ -118,30 +63,27 @@ namespace My2Blazor.Data
                 }
                 else if (newChamp.Contains("'"))
                 {
-                    string s = newChamp[0].ToString();
-                    string s1 = newChamp[newChamp.Length - 1].ToString();
+                    string firstLetter = newChamp[0].ToString();
+                    string lastLetter = newChamp[newChamp.Length - 1].ToString();
 
-                    string ch = "'";
-                    int freq = newChamp.Split(ch.ToCharArray()).Length - 1;
+                    string charLookingFor = "'";
 
-                    if (s == "'" || s1 == "'" || freq > 1)
+                    int freqOfFoundChar = newChamp.Split(charLookingFor.ToCharArray()).Length - 1;
+
+                    if (firstLetter == "'" || lastLetter == "'" || freqOfFoundChar > 1)
                     {
                         ErrorMessage = true;
-                  
                     }
                     else
                     {
                         newChamp = newChamp.Replace("'", string.Empty);
 
-                        IsItValid();
-
-                        if (IsItValid() == false)
+                        if (IsItValidButDoNothing() == false)
                         {
                             newChamp = newChamp.ToLower();
                             newChamp = char.ToUpper(newChamp[0]) + newChamp.Substring(1);
                         }
                         ValidateAndGo();
-
                     }
 
                 }
@@ -151,10 +93,9 @@ namespace My2Blazor.Data
                 }
             }
         }
+
         public bool PeskyChampions()
         {
-
-
             if (newChamp.Length == 0)
             {
 
@@ -170,7 +111,7 @@ namespace My2Blazor.Data
 
             else if (newChamp == "Nunu & Willump" || newChamp == "Nunu")
             {
-               
+
                 newChamp = "Nunu";
                 ValidateAndGo();
                 return true;
@@ -187,23 +128,10 @@ namespace My2Blazor.Data
             }
 
         }
-        public bool IsItValid()
-        {
-            if (GetRequest())
-            {
-             
-                return true;
-            }
-            else
-            {
-       
-                return false;
-            }
-        }
 
         public void ValidateAndGo()
         {
-            if (IsItValid() == false)
+            if (GetRequest() == false)
             {
                 ErrorMessage = true;
             }
@@ -213,9 +141,98 @@ namespace My2Blazor.Data
                 chData.atkRanges = aattackRanges.ToArray();
                 chData.atkSpeeds = aattackSpeeds.ToArray();
                 chData.championNames = currentChampList.ToArray();
+                chData.manaPoints = mmanaPoints.ToArray();
+                chData.healthPoints = hhealthPoints.ToArray();
             }
 
         }
+        public bool IsItValidButDoNothing()
+        {
+            try
+            {
+                jsonChampName = newChamp;
+
+                string url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/data/en_US/champion/" + jsonChampName + ".json";
+
+                var methodType = Method.Get;
+
+                RestClient client = new RestClient(BaseUrl);
+                RestRequest request = new RestRequest(url, methodType);
+                RestResponse response = client.ExecuteGet(request);
+
+
+                string jsonResponse = response.Content;
+
+                fixString = jsonResponse;
+                var result = fixString.Replace(newChamp, "Champion");
+
+                ChampionObject.Root jsonIntoObject = JsonConvert.DeserializeObject<ChampionObject.Root>(result);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+
+        }
+
+        public bool GetRequest()
+        {
+            try
+            {
+                jsonChampName = newChamp;
+               
+                string url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/data/en_US/champion/" + jsonChampName + ".json";
+
+                var methodType = Method.Get;
+
+                RestClient client = new RestClient(BaseUrl);
+                RestRequest request = new RestRequest(url, methodType);
+                RestResponse response = client.ExecuteGet(request);
+
+                string jsonResponse = response.Content;
+                fixString = jsonResponse;
+                var result = fixString.Replace(newChamp, "Champion");
+
+                ChampionObject.Root jsonIntoObject = JsonConvert.DeserializeObject<ChampionObject.Root>(result);
+
+                aattackSpeeds.Add(jsonIntoObject.data.champion.stats.attackspeed.ToString());
+                aattackRanges.Add(jsonIntoObject.data.champion.stats.attackrange.ToString());
+                mmanaPoints.Add(jsonIntoObject.data.champion.stats.mp.ToString());
+                hhealthPoints.Add(jsonIntoObject.data.champion.stats.hp.ToString());
+                currentChampList.Add(newChampOriginal);
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+                throw;
+            }
+        }
+
+
+        public Task<ChampionInfo[]> GetChampionInfo()
+        {
+            return Task.FromResult(Enumerable.Range(0, NoChampionsSoFar).Select(index => new ChampionInfo(chData.championNames[index], chData.atkSpeeds[index], chData.atkRanges[index], chData.manaPoints[index], chData.healthPoints[index])
+            {
+                Name = chData.championNames[index],
+                AttackSpeed = chData.atkSpeeds[index],
+                AttackRange = chData.atkRanges[index],
+                ManaPoints = chData.manaPoints[index],
+                HealthPoints = chData.healthPoints[index]
+            }).ToArray());
+        }
+
+      
+
+       
+
+       
+ 
+      
     }
 }
 

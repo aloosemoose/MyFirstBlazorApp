@@ -6,13 +6,17 @@
         public string Name { get; set; }
         public string AttackSpeed { get; set; }
         public string AttackRange { get; set; }
-
-        public ChampionInfo(string name, string attackspeed, string attackrange)
+        public string ManaPoints { get; set; }
+        public string HealthPoints { get; set; }
+       
+        public ChampionInfo(string name, string attackspeed, string attackrange, string manapoints, string healthpoints)
         {
 
             Name = name;
             AttackSpeed = attackspeed;
             AttackRange = attackrange;
+            HealthPoints = healthpoints;
+            ManaPoints = manapoints;
         }
 
     }

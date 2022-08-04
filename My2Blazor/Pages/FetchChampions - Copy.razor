@@ -1,20 +1,19 @@
-﻿@page "/fetchchampions"
+﻿@page "/fetchchampions2"
 
 @using My2Blazor.Data
 @inject ChampionService championService
+<header>
+    <h1>Inspect League Champions</h1>
 
-<h1>Inspect League Champions</h1>
+</header>
+
 
 <p>Get Champion statistics and compare!</p>
-
 
 <input @bind=champName/>
 
 
-
-    <p>Advice: @advice</p>
-
-
+<p>Advice: @advice</p>
 
 
 <button class="btn btn-primary" @onclick=GetChampName>Add</button>
@@ -53,11 +52,14 @@ else
         </tbody>
     </table>
 }
-
-   <img src="@championUrl" asp-append-version="true" width="300" />
-
-
      
+
+  
+
+
+
+
+
 
 @code {
     ChampionService cService = new ChampionService();
@@ -111,4 +113,3 @@ else
     }
 
 }
-
